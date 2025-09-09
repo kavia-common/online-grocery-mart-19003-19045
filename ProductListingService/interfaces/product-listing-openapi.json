@@ -1,0 +1,86 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Product Listing API",
+    "version": "1.0.0",
+    "description": "API for product catalog listing, search, filtering, and sorting."
+  },
+  "paths": {
+    "/products": {
+      "get": {
+        "summary": "List and search products",
+        "description": "Retrieve a list of products with optional search, filtering, and sorting parameters.",
+        "parameters": [
+          { "name": "search", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "category", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "brand", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "priceRange", "in": "query", "required": false, "schema": { "type": "string", "pattern": "^\\d+-\\d+$" } },
+          { "name": "sortBy", "in": "query", "required": false, "schema": { "type": "string", "enum": ["price", "popularity", "ratings"] } },
+          { "name": "page", "in": "query", "required": false, "schema": { "type": "integer", "minimum": 1 } },
+          { "name": "pageSize", "in": "query", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 100 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of products",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["products", "totalCount", "page", "pageSize"],
+                  "properties": {
+                    "products": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } },
+                    "totalCount": { "type": "integer" },
+                    "page": { "type": "integer" },
+                    "pageSize": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        },
+        "security": [
+          { "apiKeyAuth": [] }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY"
+      }
+    },
+    "schemas": {
+      "Product": {
+        "type": "object",
+        "required": ["id", "name", "price", "availability"],
+        "properties": {
+          "id": { "type": "string", "description": "Unique identifier for the product" },
+          "name": { "type": "string", "description": "Name of the product" },
+          "price": { "type": "number", "format": "float", "description": "Price of the product" },
+          "description": { "type": "string", "description": "Detailed description of the product" },
+          "images": { "type": "array", "items": { "type": "string", "format": "uri" }, "description": "List of product images" },
+          "availability": { "type": "boolean", "description": "Availability status of the product" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "integer", "description": "Error code" },
+          "message": { "type": "string", "description": "Error message" }
+        }
+      }
+    }
+  }
+}

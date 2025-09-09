@@ -3,6 +3,7 @@ const express = require('express');
 const routes = require('./routes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('../swagger');
+const config = require('./config/env');
 
 // Initialize express app
 const app = express();
@@ -10,7 +11,7 @@ const app = express();
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', config.apiKeyHeader || 'X-API-KEY']
 }));
 app.set('trust proxy', true);
 app.use('/docs', swaggerUi.serve, (req, res, next) => {
@@ -32,6 +33,7 @@ app.use('/docs', swaggerUi.serve, (req, res, next) => {
     servers: [
       {
         url: `${protocol}://${fullHost}`,
+        description: `Dynamic server (${config.env})`,
       },
     ],
   };

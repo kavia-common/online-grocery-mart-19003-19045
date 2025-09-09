@@ -1,4 +1,5 @@
-// This file will export middleware as the application grows
+const apiKeyAuth = require('./apiKeyAuth');
+
 module.exports = {
-  // Add your middleware here
+  apiKeyAuth,
 };
